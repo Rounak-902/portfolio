@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>Thank You - Raunak's Portfolio</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+  <style>
+    /* Remove all scrolling */
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    /* Full viewport layout */
+    .thankyou-wrapper {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* Main thankyou content */
+    .thankyou-hero {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+    }
+
+    .thankyou-hero .hero-content {
+      z-index: 2;
+    }
+
+    .thankyou-hero .hero-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1;
+    }
+
+    /* Ensure footer stays visible at bottom */
+    .footer {
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="thankyou-wrapper">
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="{{ url_for('home') }}" class="nav-logo">RAUNAK</a>
+        <ul class="nav-menu">
+          <li><a href="{{ url_for('home') }}#home" class="nav-link">Home</a></li>
+          <li><a href="{{ url_for('home') }}#about" class="nav-link">About</a></li>
+          <li><a href="{{ url_for('home') }}#skills" class="nav-link">Skills</a></li>
+          <li><a href="{{ url_for('home') }}#projects" class="nav-link">Projects</a></li>
+          <li><a href="{{ url_for('home') }}#education" class="nav-link">Education</a></li>
+          <li><a href="{{ url_for('home') }}#contact" class="nav-link">Contact</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Thank You Section -->
+    <section class="hero thankyou-hero">
+      <div class="hero-background"></div>
+      <div class="hero-content">
+        <div class="hero-text">
+          <h1 class="hero-title">
+            <span class="greeting">Thank You!</span>
+            <span class="name">Your message has been sent.</span>
+          </h1>
+          <p class="hero-subtitle">I’ll get back to you as soon as possible.</p>
+          <div class="hero-buttons">
+            <a href="{{ url_for('home') }}" class="btn btn-primary">
+              <i class="fas fa-home"></i> Back to Home
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-left">
+            <p>&copy; 2024 Raunak Panigrahi. All rights reserved.</p>
+          </div>
+          <div class="footer-right">
+            <div class="footer-socials">
+              <a href="https://instagram.com/Raunak_panigrahi_" target="_blank" class="footer-social" title="instagram">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="https://github.com/Rounak-902" target="_blank" class="footer-social" title="GitHub">
+                <i class="fab fa-github"></i>
+              </a>
+              <a href="https://www.linkedin.com/in/Raunak-Panigrahi" target="_blank" class="footer-social"
+                title="LinkedIn">
+                <i class="fab fa-linkedin-in"></i>
+              </a>
+              <a href="mailto:rounakpanigrahi902@gmail.com" class="footer-social" title="Email">
+                <i class="fas fa-envelope"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

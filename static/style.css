@@ -919,6 +919,16 @@ ul, ol {
     gap: 2rem;
   }
 }
+.phone-link {
+  color: #b0c4de;        /* same as your contact text */
+  text-decoration: none; /* remove underline */
+  transition: color 0.3s ease;
+}
+
+.phone-link:hover {
+  color: #00d4ff;        /* highlight on hover */
+}
+
 
 @media screen and (max-width: 768px) {
   html {

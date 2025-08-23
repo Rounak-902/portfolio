@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, url_for
 import mysql.connector
 from mysql.connector import Error
 import smtplib
@@ -94,7 +94,11 @@ def submit():
     insert_into_db(name, email, subject, message)
     send_notification(name, email, subject, message)
 
-    return redirect("/")  # Optionally redirect to a thank-you page
+    return redirect(url_for("thank_you"))  # Optionally redirect to a thank-you page
+
+@app.route('/thankyou')
+def thank_you():
+    return render_template("thankyou.html")
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=3000)
