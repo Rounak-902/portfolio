@@ -14,11 +14,11 @@ app.secret_key = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
 
 # Database configuration
 # db_config = {
-    'host': os.getenv("DB_HOST", "localhost"),
-    'user': os.getenv("DB_USER", "root"),
-    'password': os.getenv("DB_PASS", ""),
-    'database': os.getenv("DB_NAME", "portfolio_db")
-}
+#     'host': os.getenv("DB_HOST", "localhost"),
+#     'user': os.getenv("DB_USER", "root"),
+#     'password': os.getenv("DB_PASS", ""),
+#     'database': os.getenv("DB_NAME", "portfolio_db")
+# }
 
 # Email configuration
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
