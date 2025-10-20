@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, redirect, url_for, flash
 import mysql.connector
-from mysql.connector import Error
+# from mysql.connector import Error
 import smtplib
 from email.message import EmailMessage
 import os
@@ -13,7 +13,7 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
 
 # Database configuration
-db_config = {
+# db_config = {
     'host': os.getenv("DB_HOST", "localhost"),
     'user': os.getenv("DB_USER", "root"),
     'password': os.getenv("DB_PASS", ""),
@@ -71,7 +71,7 @@ Message:
         print(f"✗ Email sending failed: {e}")
         return False
 
-def insert_into_db(name, email, subject, message):
+# def insert_into_db(name, email, subject, message):
     """Insert contact form data into database"""
     connection = None
     cursor = None
@@ -138,20 +138,20 @@ def submit():
             return redirect(url_for("home"))
 
         # Try to insert into database
-        db_success = insert_into_db(name, email, subject, message)
+        # db_success = insert_into_db(name, email, subject, message)
         
         # Try to send email notification
         email_success = send_notification(name, email, subject, message)
 
         # Check results
-        if db_success and email_success:
+        if email_success:
             print("✓ Form submission successful!")
             return redirect(url_for("thank_you"))
-        elif db_success or email_success:
-            print("⚠ Partial success (check logs above)")
-            return redirect(url_for("thank_you"))
+        # elif db_success or email_success:
+        #     print("⚠ Partial success (check logs above)")
+        #     return redirect(url_for("thank_you"))
         else:
-            print("✗ Both database and email failed")
+            print("✗ email failed")
             flash("There was an error submitting your form. Please try again.", "error")
             return redirect(url_for("home"))
 
@@ -168,9 +168,9 @@ def thank_you():
 
 if __name__ == "__main__":
     print("\n=== Flask App Starting ===")
-    print(f"Database Host: {db_config['host']}")
-    print(f"Database Name: {db_config['database']}")
-    print(f"Database User: {db_config['user']}")
+    # print(f"Database Host: {db_config['host']}")
+    # print(f"Database Name: {db_config['database']}")
+    # print(f"Database User: {db_config['user']}")
     print(f"Email User: {EMAIL_USER}")
     print(f"Email From: {EMAIL_FROM}")
     print(f"Admin Email: {ADMIN_EMAIL}")
