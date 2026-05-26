@@ -21,9 +21,14 @@ app.secret_key = secret_key
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
-EMAIL_FROM = os.getenv("EMAIL_FROM", EMAIL_USER)  # Use EMAIL_FROM if provided, else EMAIL_USER
+# EMAIL_FROM must match the authenticated Gmail account; fall back to EMAIL_USER
+EMAIL_FROM = os.getenv("EMAIL_FROM") or EMAIL_USER
 SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
-SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+
+try:
+    SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+except (ValueError, TypeError):
+    SMTP_PORT = 587
 
 
 def send_notification(name, email, subject, message):
@@ -68,6 +73,15 @@ def send_notification(name, email, subject, message):
         print(f"[SUCCESS] Email sent successfully to {ADMIN_EMAIL}")
         return True
 
+    except smtplib.SMTPAuthenticationError:
+        print("✗ Email authentication failed. Check EMAIL_USER / EMAIL_PASS.")
+        return False
+    except smtplib.SMTPException as e:
+        print(f"✗ SMTP error: {e}")
+        return False
+    except OSError as e:
+        print(f"✗ Network error sending email: {e}")
+        return False
     except Exception as e:
         print(f"[ERROR] Email sending failed: {e}")
         return False
@@ -97,16 +111,20 @@ def submit():
         if not name or not email or not message:
             print("[ERROR] Validation failed: Missing required fields")
             flash("Please fill in all required fields.", "error")
-            return redirect(url_for("home"))
+            return redirect(url_for("home") + "#contact")
 
         # Validate email format
-        email_pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+        email_pattern = r"^[\w\.\+\-]+@[\w\.-]+\.\w+$"
         if not re.match(email_pattern, email):
             print("[ERROR] Validation failed: Invalid email format")
             flash("Please enter a valid email address.", "error")
-            return redirect(url_for("home"))
+            return redirect(url_for("home") + "#contact")
 
-        # Only send email (DB code removed as requested)
+        # Enforce reasonable length limits
+        if len(name) > 200 or len(email) > 254 or len(subject) > 300 or len(message) > 5000:
+            flash("One or more fields exceed the maximum allowed length.", "error")
+            return redirect(url_for("home") + "#contact")
+
         email_success = send_notification(name, email, subject, message)
 
         if email_success:
@@ -114,15 +132,15 @@ def submit():
             return redirect(url_for("thank_you"))
         else:
             print("[ERROR] Email sending failed")
-            flash("There was an error submitting your form. Please try again.", "error")
-            return redirect(url_for("home"))
+            flash("There was an error sending your message. Please try again or contact me directly.", "error")
+            return redirect(url_for("home") + "#contact")
 
     except Exception as e:
         print(f"[ERROR] Unexpected error in submit route: {e}")
         import traceback
         traceback.print_exc()
         flash("An unexpected error occurred. Please try again later.", "error")
-        return redirect(url_for("home"))
+        return redirect(url_for("home") + "#contact")
 
 
 @app.route("/thankyou")
@@ -138,4 +156,5 @@ if __name__ == "__main__":
     print(f"SMTP Server: {SMTP_SERVER}")
     print(f"SMTP Port: {SMTP_PORT}")
     print("========================\n")
-    app.run(debug=True, host="0.0.0.0", port=3000)
+    app.run(debug=os.getenv("FLASK_DEBUG", "false").lower() == "true",
+            host="0.0.0.0", port=int(os.getenv("PORT", "3000")))
