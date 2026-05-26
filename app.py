@@ -12,7 +12,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
+secret_key = os.getenv("SECRET_KEY")
+if not secret_key:
+    secret_key = "dev-secret-key-change-in-production"
+app.secret_key = secret_key
 
 # Email configuration
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
