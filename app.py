@@ -12,7 +12,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
+secret_key = os.getenv("SECRET_KEY")
+if not secret_key:
+    secret_key = os.urandom(32)
+app.secret_key = secret_key
 
 # Email configuration
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
@@ -35,8 +38,11 @@ def send_notification(name, email, subject, message):
             print("Email configuration is incomplete!")
             return False
 
+        # Sanitize subject to remove line breaks
+        sanitized_subject = re.sub(r"[\r\n]+", " ", subject or "No subject")
+
         msg = EmailMessage()
-        msg["Subject"] = f"New Contact Form Submission: {subject or 'No subject'}"
+        msg["Subject"] = f"New Contact Form Submission: {sanitized_subject}"
         msg["From"] = EMAIL_FROM
         msg["To"] = ADMIN_EMAIL
         msg["Reply-To"] = email
@@ -64,7 +70,7 @@ def send_notification(name, email, subject, message):
                 smtp.login(EMAIL_USER, EMAIL_PASS)
                 smtp.send_message(msg)
 
-        print(f"✓ Email sent successfully to {ADMIN_EMAIL}")
+        print(f"[SUCCESS] Email sent successfully to {ADMIN_EMAIL}")
         return True
 
     except smtplib.SMTPAuthenticationError:
@@ -77,7 +83,7 @@ def send_notification(name, email, subject, message):
         print(f"✗ Network error sending email: {e}")
         return False
     except Exception as e:
-        print(f"✗ Email sending failed: {e}")
+        print(f"[ERROR] Email sending failed: {e}")
         return False
 
 
@@ -96,21 +102,21 @@ def submit():
         message = request.form.get("message", "").strip()
 
         print("\n--- New Form Submission ---")
-        print(f"Name: {name}")
-        print(f"Email: {email}")
-        print(f"Subject: {subject}")
-        print(f"Message: {message[:50]}{'...' if len(message) > 50 else ''}")
+        print(f"Name: {name.encode('ascii', 'replace').decode('ascii')}")
+        print(f"Email: {email.encode('ascii', 'replace').decode('ascii')}")
+        print(f"Subject: {subject.encode('ascii', 'replace').decode('ascii')}")
+        print(f"Message: {message[:50].encode('ascii', 'replace').decode('ascii')}...")
 
         # Validate required fields
         if not name or not email or not message:
-            print("✗ Validation failed: Missing required fields")
+            print("[ERROR] Validation failed: Missing required fields")
             flash("Please fill in all required fields.", "error")
             return redirect(url_for("home") + "#contact")
 
         # Validate email format
         email_pattern = r"^[\w\.\+\-]+@[\w\.-]+\.\w+$"
         if not re.match(email_pattern, email):
-            print("✗ Validation failed: Invalid email format")
+            print("[ERROR] Validation failed: Invalid email format")
             flash("Please enter a valid email address.", "error")
             return redirect(url_for("home") + "#contact")
 
@@ -122,15 +128,15 @@ def submit():
         email_success = send_notification(name, email, subject, message)
 
         if email_success:
-            print("✓ Form submission successful!")
+            print("[SUCCESS] Form submission successful!")
             return redirect(url_for("thank_you"))
         else:
-            print("✗ Email sending failed")
+            print("[ERROR] Email sending failed")
             flash("There was an error sending your message. Please try again or contact me directly.", "error")
             return redirect(url_for("home") + "#contact")
 
     except Exception as e:
-        print(f"✗ Unexpected error in submit route: {e}")
+        print(f"[ERROR] Unexpected error in submit route: {e}")
         import traceback
         traceback.print_exc()
         flash("An unexpected error occurred. Please try again later.", "error")
